@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('preview-selfie'),
     ];
     const submitButton = document.getElementById('submit-button');
-
+    const serverUrl = "https://testingv1.onrender.com";
     let uploadStep = 0;
     const filesCache = []; // Cache for temporarily storing files
 
