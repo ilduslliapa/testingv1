@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append('archive', zipBlob, 'photos.zip');
 
         try {
-            const response = await fetch('http://localhost:5000/upload-archive', {
+            const response = await fetch('${serverUrl}/upload-archive', {
                 method: 'POST',
                 body: formData,
             });
