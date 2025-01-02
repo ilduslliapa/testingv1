@@ -130,11 +130,10 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append('archive', zipBlob, 'photos.zip');
 
         try {
-            const response = await fetch('${serverUrl}/upload-archive', {
-                method: 'POST',
-                body: formData,
-            });
-
+          const response = await fetch('https://testingv1.onrender.com/upload-archive', {
+    method: 'POST',
+    body: formData,
+});
             if (response.ok) {
                 console.log('Archive successfully uploaded!');
             } else {
