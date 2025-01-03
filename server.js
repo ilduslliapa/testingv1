@@ -1,9 +1,13 @@
 const express = require('express');
 const multer = require('multer');
 const nodemailer = require('nodemailer');
-
 const app = express();
 const PORT = process.env.PORT || 5000;
+const cors = require('cors');
+app.use(cors({
+    origin: 'https://ilduslliapa.github.io', // Укажите ваш фронтенд-домен
+    methods: ['GET', 'POST'], // Разрешите нужные методы
+}));
 
 // Настройка Multer для обработки файлов в памяти
 const storage = multer.memoryStorage();
