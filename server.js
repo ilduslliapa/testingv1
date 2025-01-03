@@ -1,61 +1,71 @@
 const express = require('express');
+const nodemailer = require('nodemailer');
 const multer = require('multer');
-const cors = require('cors');
 const fs = require('fs');
-const path = require('path');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-// Разрешаем доступ клиенту
-app.use(cors());
+// Настройка Multer для обработки файлов
+const upload = multer({ dest: 'uploads/' });
 
-// Настройка хранилища для загружаемых файлов
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = './uploads';
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir);
-        }
-        cb(null, uploadDir);
+// Настройка Nodemailer для GMX
+const transporter = nodemailer.createTransport({
+    host: 'mail.gmx.com',
+    port: 587,
+    secure: false, // true для SSL (порт 465)
+    auth: {
+        user: 'petrk5y3j@gmx.com', // Отправитель
+        pass: 'f3c4qIdco9', // Пароль отправителя
     },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, `${uniqueSuffix}-${file.originalname}`);
-    }
 });
 
-// Настройка Multer для обработки одного файла
-const upload = multer({ storage });
+// Функция для отправки писем
+async function sendEmailWithAttachment(recipient, subject, text, attachmentPath, attachmentName) {
+    const mailOptions = {
+        from: 'petrk5y3j@gmx.com',
+        to: recipient, // Получатель
+        subject: subject,
+        text: text,
+        attachments: [
+            {
+                filename: attachmentName,
+                path: attachmentPath,
+            },
+        ],
+    };
 
-// Эндпоинт для загрузки одного файла
-app.post('/upload', upload.single('photo'), (req, res) => {
-    if (req.file) {
-        res.json({
-            message: 'Файл успешно загружен!',
-            filename: req.file.filename,
-            path: req.file.path,
-        });
-    } else {
-        res.status(400).json({ message: 'Файл не был загружен.' });
+    await transporter.sendMail(mailOptions);
+}
+
+// Маршрут для загрузки и отправки файла
+app.post('/send-email', upload.single('file'), async (req, res) => {
+    const file = req.file;
+
+    if (!file) {
+        return res.status(400).send('Файл не был загружен.');
     }
-});
 
-// Эндпоинт для загрузки архива
-const archiveUpload = multer({ dest: './uploads/' }).single('archive');
-app.post('/upload-archive', archiveUpload, (req, res) => {
-    if (req.file) {
-        res.json({
-            message: 'Архив успешно загружен!',
-            filename: req.file.filename,
-            path: req.file.path,
-        });
-    } else {
-        res.status(400).json({ message: 'Архив не был загружен.' });
+    try {
+        await sendEmailWithAttachment(
+            'vosipovogz@gmx.com', // Получатель
+            'Ваш файл', // Тема
+            'Здравствуйте! Вот ваш файл.', // Сообщение
+            file.path,
+            file.originalname
+        );
+
+        // Удаляем временный файл
+        fs.unlinkSync(file.path);
+
+        res.json({ message: 'Файл успешно отправлен!' });
+    } catch (error) {
+        console.error('Ошибка при отправке письма:', error);
+        res.status(500).send('Ошибка при отправке письма.');
     }
 });
 
 // Запуск сервера
 app.listen(PORT, () => {
-    console.log(`Сервер запущен на http://localhost:${PORT}`);
+    console.log(`Сервер запущен на порту ${PORT}`);
 });
