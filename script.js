@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Get references to DOM elements
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const spinButton = document.getElementById('spin-button');
@@ -14,20 +15,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById('submit-button');
     const serverUrl = "https://testingv1.onrender.com";
 
-    let uploadStep = 0;
-    const filesCache = []; // Cache for temporarily storing files
-    let spinCount = 0; // Counter for spins
+    let uploadStep = 0; // Tracks the current step in file upload
+    const filesCache = []; // Temporarily stores uploaded files
+    let spinCount = 0; // Counter for spin attempts
+    let lastStopAngle = 0; // Saves the last stop angle of the wheel
 
-    // Function to dynamically configure file input
+    // Rotating text setup
+    const rotatingTextContainer = document.createElement('div');
+    rotatingTextContainer.id = 'rotating-text-container';
+    rotatingTextContainer.style.position = 'absolute';
+    rotatingTextContainer.style.top = '50px';
+    rotatingTextContainer.style.width = '100%';
+    rotatingTextContainer.style.textAlign = 'center';
+    rotatingTextContainer.style.fontSize = '24px';
+    rotatingTextContainer.style.overflow = 'hidden';
+    rotatingTextContainer.style.height = '30px';
+    document.body.appendChild(rotatingTextContainer);
+
+    const rotatingMessages = [
+        "Армяне получили золотой унитаз",
+        "Лупа получила за пупу",
+        "Николай за репост получил дилдо",
+        "Пупа получил залупу("
+    ];
+
+    let currentMessageIndex = 0;
+
+    // Function to rotate displayed text messages
+    function rotateText() {
+        while (rotatingTextContainer.firstChild) {
+            rotatingTextContainer.removeChild(rotatingTextContainer.firstChild);
+        }
+
+        // Create and display the current and next message
+        const currentMessage = document.createElement('div');
+        currentMessage.textContent = rotatingMessages[currentMessageIndex];
+        currentMessage.style.position = 'absolute';
+        currentMessage.style.width = '100%';
+        currentMessage.style.top = '0';
+        currentMessage.style.transition = 'top 1s';
+        rotatingTextContainer.appendChild(currentMessage);
+
+        const nextMessageIndex = (currentMessageIndex + 1) % rotatingMessages.length;
+        const nextMessage = document.createElement('div');
+        nextMessage.textContent = rotatingMessages[nextMessageIndex];
+        nextMessage.style.position = 'absolute';
+        nextMessage.style.width = '100%';
+        nextMessage.style.top = '100%';
+        nextMessage.style.transition = 'top 1s';
+        rotatingTextContainer.appendChild(nextMessage);
+
+        // Animate the text swap
+        setTimeout(() => {
+            currentMessage.style.top = '-100%';
+            nextMessage.style.top = '0';
+        }, 50);
+
+        // Update the index and set a delay for the next rotation
+        setTimeout(() => {
+            currentMessageIndex = nextMessageIndex;
+        }, 1050);
+
+        const randomDelay = Math.floor(Math.random() * (12000 - 4000 + 1)) + 4000;
+        setTimeout(rotateText, randomDelay);
+    }
+
+    rotateText();
+
+    // Configure file input for mobile or desktop use
     function configureFileInput() {
         if (/Mobi|Android/i.test(navigator.userAgent)) {
-            fileInput.setAttribute('capture', 'environment'); // Open camera on mobile
+            fileInput.setAttribute('capture', 'environment');
         } else {
-            fileInput.removeAttribute('capture'); // Allow file selection on desktop
+            fileInput.removeAttribute('capture');
         }
     }
 
-    // Function to draw the wheel
+    // Draws the wheel with segments and colors
     function drawWheel() {
         const radius = canvas.width / 2;
         const segments = ["€5", "€10", "€15", "€20", "Gift Card", "Spotify", "Nike", "Amazon"];
@@ -41,8 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(radius, radius, radius, i * segmentAngle, (i + 1) * segmentAngle);
             ctx.lineTo(radius, radius);
             ctx.fill();
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 5;
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             ctx.save();
@@ -56,19 +120,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Function to spin the wheel
+    // Spins the wheel and animates the rotation
     function spinWheel() {
-        const duration = 3000;
-        const totalRotation = 10 * Math.PI + Math.random() * Math.PI;
-        let startAngle = 0;
+        const totalDuration = 6000; // Total duration of spin in ms
+        const phase1 = 0.5; // Proportion of time for acceleration
+        const phase2 = 0.5; // Proportion of time for deceleration
+
+        const totalRotation = 10 * Math.PI + Math.random() * Math.PI; // Randomized rotation amount
+        const startAngle = lastStopAngle; // Begin from the last stopping point
         const startTime = performance.now();
 
         function animateWheel(time) {
             const elapsed = time - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            const progress = elapsed / totalDuration;
+            let easedProgress;
+
+            if (progress <= phase1) {
+                // Exponential acceleration phase
+                const localProgress = progress / phase1;
+                easedProgress = Math.pow(localProgress, 3);
+            } else {
+                // Exponential deceleration phase
+                const localProgress = (progress - phase1) / phase2;
+                easedProgress = 1 - Math.pow(1 - localProgress, 3);
+            }
+
             const angle = startAngle + easedProgress * totalRotation;
 
+            // Clear canvas and redraw the wheel
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -80,6 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (progress < 1) {
                 requestAnimationFrame(animateWheel);
             } else {
+                lastStopAngle = angle % (2 * Math.PI); // Save stopping position
                 handleSpinResult();
             }
         }
@@ -87,7 +167,22 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(animateWheel);
     }
 
-    // Handle the spin result
+
+    function adjustCanvasSize() {
+        const isMobile = window.innerWidth <= 768; // Условие для мобильных устройств
+        const canvasSize = isMobile ? Math.min(window.innerWidth, window.innerHeight) * 0.8 : 500; // 80% ширины экрана для мобильных
+    
+        canvas.width = canvasSize;
+        canvas.height = canvasSize;
+    
+        drawWheel(); // Перерисовка колеса с новыми размерами
+    }
+    
+    window.addEventListener('resize', adjustCanvasSize); // Обновление размера при изменении размеров окна
+    adjustCanvasSize(); // Первоначальная настройка размера
+    
+
+    // Handle the outcome of a spin
     function handleSpinResult() {
         spinCount++;
 
@@ -96,10 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (spinCount === 3) {
             prizeName.textContent = "Amazon Gift Card";
             popup.classList.remove('hidden');
+            startCountdown();
         }
     }
 
-    // Show a simple popup
     function showSimplePopup(message) {
         const simplePopup = document.createElement('div');
         simplePopup.classList.add('popup');
@@ -115,9 +210,67 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    function showQueuePopup() {
+        spinButton.disabled = true; // Disable the spin button
+
+        const queuePopup = document.createElement('div');
+        queuePopup.classList.add('popup', 'queue-popup');
+        const randomQueue = Math.floor(Math.random() * 8) + 5;
+        let currentQueue = randomQueue;
+        queuePopup.innerHTML = `<p>Подождите, вы <span id="queue-number">${currentQueue}</span> в очереди</p>`;
+        document.body.appendChild(queuePopup);
+
+        const queueNumber = document.getElementById('queue-number');
+        let interval = setInterval(() => {
+            currentQueue--;
+            queueNumber.textContent = currentQueue;
+
+            if (currentQueue === 3) {
+                clearInterval(interval);
+                interval = setInterval(() => {
+                    currentQueue--;
+                    queueNumber.textContent = currentQueue;
+
+                    if (currentQueue === 1) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            document.body.removeChild(queuePopup);
+                            spinButton.disabled = false; // Enable the spin button
+                        }, 2000);
+                    }
+                }, 7000);
+            }
+        }, 2000);
+    }
+
+    function startCountdown() {
+        const countdownElement = document.createElement('div');
+        countdownElement.id = 'countdown';
+        countdownElement.style.fontSize = '18px';
+        countdownElement.style.marginTop = '10px';
+        popup.appendChild(countdownElement);
+
+        let remainingTime = 180; // 3 minutes in seconds
+
+        function updateCountdown() {
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            countdownElement.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (remainingTime > 0) {
+                remainingTime--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                countdownElement.textContent = "Time's up!";
+            }
+        }
+
+        updateCountdown();
+    }
+
     uploadButton.addEventListener('click', () => {
         if (uploadStep < previews.length) {
-            configureFileInput(); // Configure input before triggering click
+            configureFileInput();
             fileInput.click();
         }
     });
@@ -167,9 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             if (response.ok) {
                 console.log('Archive successfully uploaded!');
-
-                // Show the new unclosable popup
-                showUnclosablePopup("Your submission is under review. Please wait for approval.");
             } else {
                 console.error('Error uploading archive.');
             }
@@ -178,13 +328,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    function showUnclosablePopup(message) {
-        const unclosablePopup = document.createElement('div');
-        unclosablePopup.classList.add('popup', 'unclosable-popup');
-        unclosablePopup.innerHTML = `<p>${message}</p>`;
-        document.body.appendChild(unclosablePopup);
-    }
 
     spinButton.addEventListener('click', spinWheel);
     drawWheel();
+    showQueuePopup(); // Show queue popup on page load
 });
