@@ -22,6 +22,11 @@ h1 {
 
 .wheel-container {
     position: relative;
+    width: 500px; /* Ширина контейнера равна колесу */
+    height: 500px; /* Высота контейнера равна колесу */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #wheel {
@@ -65,6 +70,8 @@ button:disabled {
     position: fixed;
     top: 50%;
     left: 50%;
+    max-width: 80%; /* Увеличиваем ширину до 95% */
+    max-height: 80%; /* Увеличиваем высоту до 90% */
     transform: translate(-50%, -50%);
     background: #282c34;
     color: white;
@@ -73,6 +80,27 @@ button:disabled {
     text-align: center;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: 1000;
+    overflow-y: auto; /* Вертикальная прокрутка для длинного содержимого */
+}
+
+@media (max-width: 768px) {
+    .popup {
+        width: 70%; /* Ширина 95% экрана для мобильных */
+        max-height: 70%;
+    }
+}
+
+#rotating-text-container {
+    position: absolute;
+    top: 10%; /* Располагаем контейнер на 10% от верха экрана */
+    left: 50%; /* Центрируем контейнер по горизонтали */
+    transform: translateX(-50%); /* Центрируем текст относительно центра экрана */
+    width: 90%; /* Ограничиваем ширину до 90% экрана */
+    text-align: center;
+    font-size: 1.2rem; /* Размер текста для хорошей читаемости */
+    overflow: hidden;
+    height: 30px; /* Фиксируем высоту контейнера */
+    white-space: nowrap; /* Убираем перенос строки */
 }
 
 .popup.hidden {
@@ -93,7 +121,7 @@ button:disabled {
 .preview {
     margin: 10px 0;
     max-width: 120px;
-    max-height: 120px;
+    max-height: 60px;
     display: none; /* Скрываем превью по умолчанию */
     border: 2px solid white;
     border-radius: 8px;
@@ -125,4 +153,30 @@ input[type="file"] {
 canvas {
     display: block;
     margin: 0 auto;
+}
+.spin-center-button {
+    position: absolute;
+    top: 45%; /* Центрируем кнопку по вертикали */
+    left: 50%; /* Центрируем кнопку по горизонтали */
+    transform: translate(-50%, -50%); /* Корректируем смещение */
+    width: 80px; /* Устанавливаем ширину кнопки */
+    height: 80px; /* Высота равна ширине для круга */
+    border-radius: 50%; /* Делаем кнопку круглой */
+    background: #ffd700; /* Цвет кнопки */
+    color: #1a1a1a; /* Цвет текста */
+    border: none; /* Убираем границу */
+    font-size: 16px; /* Размер текста */
+    font-weight: bold; /* Толстый текст */
+    cursor: pointer; /* Указатель при наведении */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Тень для кнопки */
+    transition: background 0.3s, transform 0.2s; /* Анимация при наведении */
+}
+
+.spin-center-button:hover {
+    background: #e6b800; /* Цвет кнопки при наведении */
+    transform: translate(-50%, -50%) scale(1.1); /* Увеличение кнопки при наведении */
+}
+
+.spin-center-button:active {
+    transform: translate(-50%, -50%) scale(1); /* Убираем увеличение при нажатии */
 }

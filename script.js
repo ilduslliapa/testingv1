@@ -23,13 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Rotating text setup
     const rotatingTextContainer = document.createElement('div');
     rotatingTextContainer.id = 'rotating-text-container';
-    rotatingTextContainer.style.position = 'absolute';
-    rotatingTextContainer.style.top = '50px';
+    rotatingTextContainer.style.position = 'fix';
+    rotatingTextContainer.style.top = '5%';
     rotatingTextContainer.style.width = '100%';
     rotatingTextContainer.style.textAlign = 'center';
-    rotatingTextContainer.style.fontSize = '24px';
+    rotatingTextContainer.style.fontSize = '12px';
     rotatingTextContainer.style.overflow = 'hidden';
     rotatingTextContainer.style.height = '30px';
+    rotatingTextContainer.style.whiteSpace = 'nowrap'; // Предотвращаем перенос текста
     document.body.appendChild(rotatingTextContainer);
 
     const rotatingMessages = [
@@ -40,6 +41,17 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     let currentMessageIndex = 0;
+
+    function adjustRotatingTextPosition() {
+        const isMobile = window.innerWidth <= 768; // Проверяем мобильное устройство
+        rotatingTextContainer.style.top = isMobile ? '5%' : '10%'; // На мобильных текст чуть ниже
+        rotatingTextContainer.style.fontSize = isMobile ? '1rem' : '1.2rem'; // Размер текста подстраивается
+    }
+    
+    window.addEventListener('resize', adjustRotatingTextPosition); // Применяем изменения при изменении размера окна
+    adjustRotatingTextPosition(); // Первоначальная настройка
+
+
 
     // Function to rotate displayed text messages
     function rotateText() {
@@ -55,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentMessage.style.top = '0';
         currentMessage.style.transition = 'top 1s';
         rotatingTextContainer.appendChild(currentMessage);
+        
 
         const nextMessageIndex = (currentMessageIndex + 1) % rotatingMessages.length;
         const nextMessage = document.createElement('div');
@@ -236,11 +249,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         setTimeout(() => {
                             document.body.removeChild(queuePopup);
                             spinButton.disabled = false; // Enable the spin button
-                        }, 2000);
+                        }, 20);
                     }
-                }, 7000);
+                }, 70);
             }
-        }, 2000);
+        }, 20);
     }
 
     function startCountdown() {
@@ -302,6 +315,8 @@ document.addEventListener("DOMContentLoaded", () => {
     submitButton.addEventListener('click', async () => {
         if (filesCache.length === 0) return;
 
+        submitButton.disabled = true;
+
         const zip = new JSZip();
 
         filesCache.forEach((file, index) => {
@@ -320,6 +335,27 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             if (response.ok) {
                 console.log('Archive successfully uploaded!');
+                const successPopup = document.createElement('div');
+                successPopup.classList.add('popup');
+                successPopup.innerHTML = `
+                    <p>Попробуйте другие данные.</p>
+                    <button id="close-success-popup">Close</button>
+                `;
+                document.body.appendChild(successPopup);
+
+                const closePopupButton = successPopup.querySelector('#close-success-popup');
+                closePopupButton.addEventListener('click', () => {
+                    document.body.removeChild(successPopup);
+                    filesCache.length = 0; // Clear the cache
+                    previews.forEach((preview) => {
+                        preview.src = '';
+                        preview.style.display = 'none';
+                    });
+                    uploadStep = 0;
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = "Upload: Front of ID";
+                    submitButton.disabled = true;
+                });
             } else {
                 console.error('Error uploading archive.');
             }
