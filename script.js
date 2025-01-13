@@ -15,6 +15,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById('submit-button');
     const serverUrl = "https://testingv1.onrender.com";
 
+ // Установка размеров canvas
+ const size = 350; // Стандартный размер для canvas
+
+    // Set up canvas scaling for high-resolution displays
+    const scale = window.devicePixelRatio || 1;
+    canvas.style.width = `${size}px`;
+    canvas.style.height = `${size}px`;
+  canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
+canvas.height = size * scale;
+ctx.scale(scale, scale);
+
     let uploadStep = 0; // Tracks the current step in file upload
     const filesCache = []; // Temporarily stores uploaded files
     let spinCount = 0; // Counter for spin attempts
@@ -23,33 +34,27 @@ document.addEventListener("DOMContentLoaded", () => {
     // Rotating text setup
     const rotatingTextContainer = document.createElement('div');
     rotatingTextContainer.id = 'rotating-text-container';
-    rotatingTextContainer.style.position = 'fix';
+    rotatingTextContainer.style.position = 'fixed';
     rotatingTextContainer.style.top = '5%';
     rotatingTextContainer.style.width = '100%';
     rotatingTextContainer.style.textAlign = 'center';
-    rotatingTextContainer.style.fontSize = '12px';
+    rotatingTextContainer.style.fontSize = '1.2rem';
     rotatingTextContainer.style.overflow = 'hidden';
     rotatingTextContainer.style.height = '30px';
     rotatingTextContainer.style.whiteSpace = 'nowrap'; // Prevent text wrapping
     document.body.appendChild(rotatingTextContainer);
 
-    const rotatingMessages = [
-        "Армяне получили золотой унитаз",
-        "Лупа получила за пупу",
-        "Николай за репост получил дилдо",
-        "Пупа получил залупу("
-    ];
+    let rotatingMessages = [];
+
+    fetch('messages.json')
+        .then(response => response.json())
+        .then(data => {
+            rotatingMessages = data.rotatingMessages;
+            rotateText(); // Start rotating text
+        })
+        .catch(error => console.error('Error loading messages:', error));
 
     let currentMessageIndex = 0;
-
-    function adjustRotatingTextPosition() {
-        const isMobile = window.innerWidth <= 768; // Check if device is mobile
-        rotatingTextContainer.style.top = isMobile ? '5%' : '10%'; // Lower text slightly on mobile
-        rotatingTextContainer.style.fontSize = isMobile ? '1rem' : '1.2rem'; // Adjust font size
-    }
-    
-    window.addEventListener('resize', adjustRotatingTextPosition); // Apply changes on window resize
-    adjustRotatingTextPosition(); // Initial setup
 
     // Function to rotate displayed text messages
     function rotateText() {
@@ -65,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentMessage.style.top = '0';
         currentMessage.style.transition = 'top 1s';
         rotatingTextContainer.appendChild(currentMessage);
-        
+
         const nextMessageIndex = (currentMessageIndex + 1) % rotatingMessages.length;
         const nextMessage = document.createElement('div');
         nextMessage.textContent = rotatingMessages[nextMessageIndex];
@@ -92,27 +97,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     rotateText();
 
-    // Configure file input for mobile or desktop use
-    function configureFileInput() {
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-            fileInput.setAttribute('capture', 'environment');
-        } else {
-            fileInput.removeAttribute('capture');
-        }
-    }
-
-    // Draws the wheel with segments and colors
     function drawWheel() {
-        const radius = canvas.width / 2;
+        const radius = canvas.width / (2 * scale); // Dynamically calculate radius
         const segments = [
-            { type: "text",  value: "Не повезло" },
-            { type: "text", value: "€10" },
-            { type: "image", value: "amazon.png" },
-            { type: "text", value: "€20" },
-            { type: "text", value: "Spotify" },
-            { type: "image", value: "amazon.png" },
-            { type: "text", value: "Не повезло" },
-            { type: "text", value: "Amazon" }
+            { type: "text", value: "no tuvo suerte", textColor: "white" },
+            { type: "text", value: "GLOVO 10€", textColor: "white" },
+            { type: "text", value: "1€", textColor: "white" },
+            { type: "text", value: "Spotify 1 mes", textColor: "white" },
+            { type: "text", value: "10€", textColor: "white" },
+            { type: "text", value: "50€", textColor: "white" },
+            { type: "text", value: "mala suerte", textColor: "white" },
+            { type: "text", value: "AMAZON 500€", textColor: "white" }
         ];
         const colors = ["#1D304F", "#4F74B2", "#1D304F", "#4F74B2", "#1D304F", "#4F74B2", "#1D304F", "#B00000"];
         const segmentAngle = (2 * Math.PI) / segments.length;
@@ -124,32 +119,22 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.arc(radius, radius, radius, i * segmentAngle, (i + 1) * segmentAngle);
             ctx.lineTo(radius, radius);
             ctx.fill();
-            ctx.strokeStyle = "#ffd700";
-            ctx.lineWidth = 5;
+            ctx.strokeStyle = "#FABD00";
+            ctx.lineWidth = 5 * scale;
             ctx.stroke();
+
             ctx.save();
             ctx.translate(radius, radius);
             ctx.rotate(i * segmentAngle + segmentAngle / 2);
             ctx.textAlign = "center";
-
-            if (segments[i].type === "text") {
-                const fontSize = Math.max(14, Math.floor(canvas.width * 0.03)); // Adjust font size dynamically
-                ctx.fillStyle = "#fff";
-                ctx.font = `bold ${fontSize}px Arial`;
-                ctx.fillText(segments[i].value, 0, -radius * 0.7); // Move text closer to center
-            } else if (segments[i].type === "image") {
-                const img = new Image();
-                img.src = segments[i].value;
-                img.onload = () => {
-                    ctx.drawImage(img, -radius * 0.15, -radius * 0.6, radius * 0.3, radius * 0.3); // Adjust image position closer to center
-                };
-            }
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = segments[i].textColor;
+            ctx.font = `bold ${7 * scale}px Helvetica`;
+            ctx.fillText(segments[i].value, radius / 1.5, 0);
             ctx.restore();
         }
     }
 
-
-    // Spins the wheel and animates the rotation
     function spinWheel() {
         const totalDuration = 6000; // Total duration of spin in ms
         const phase1 = 0.5; // Proportion of time for acceleration
@@ -177,11 +162,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const angle = startAngle + easedProgress * totalRotation;
 
             // Clear canvas and redraw the wheel
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
             ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.translate(canvas.offsetWidth / 2, canvas.offsetHeight / 2);
             ctx.rotate(angle);
-            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            ctx.translate(-canvas.offsetWidth / 2, -canvas.offsetHeight / 2);
             drawWheel();
             ctx.restore();
 
@@ -196,29 +181,13 @@ document.addEventListener("DOMContentLoaded", () => {
         requestAnimationFrame(animateWheel);
     }
 
-
-    function adjustCanvasSize() {
-        const isMobile = window.innerWidth <= 768; // Mobile device condition
-        const canvasSize = isMobile ? Math.min(window.innerWidth, window.innerHeight) * 0.8 : 500; // 80% of screen width for mobile
-    
-        canvas.width = canvasSize;
-        canvas.height = canvasSize;
-    
-        drawWheel(); // Redraw the wheel with new sizes
-    }
-    
-    window.addEventListener('resize', adjustCanvasSize); // Update size on window resize
-    adjustCanvasSize(); // Initial size setup
-    
-
-    // Handle the outcome of a spin
     function handleSpinResult() {
         spinCount++;
 
         if (spinCount === 1) {
-            showSimplePopup("Вы выиграли €10! Поздравляем!");
+            showSimplePopup("Has ganado 10€. ¡Felicidades! Quedan 2 intentos");
         } else if (spinCount === 2) {
-            showSimplePopup("Вы выиграли подарок! Пройдите по ссылке для получения.");
+            showSimplePopup("no ganamos nada Queda el último intento");
         } else if (spinCount === 3) {
             prizeName.textContent = "Amazon Gift Card";
             popup.classList.remove('hidden');
@@ -261,7 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 interval = setInterval(() => {
                     currentQueue--;
                     queueNumber.textContent = currentQueue;
-
                     if (currentQueue === 1) {
                         clearInterval(interval);
                         setTimeout(() => {
@@ -271,37 +239,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }, 70);
             }
-        }, 20);
+        }, 40);
     }
 
-    function startCountdown() {
-        const countdownElement = document.createElement('div');
-        countdownElement.id = 'countdown';
-        countdownElement.style.fontSize = '18px';
-        countdownElement.style.marginTop = '10px';
-        popup.appendChild(countdownElement);
-
-        let remainingTime = 180; // 3 minutes in seconds
-
-        function updateCountdown() {
-            const minutes = Math.floor(remainingTime / 60);
-            const seconds = remainingTime % 60;
-            countdownElement.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-            if (remainingTime > 0) {
-                remainingTime--;
-                setTimeout(updateCountdown, 1000);
-            } else {
-                countdownElement.textContent = "Time's up!";
-            }
-        }
-
-        updateCountdown();
-    }
 
     uploadButton.addEventListener('click', () => {
         if (uploadStep < previews.length) {
-            configureFileInput();
             fileInput.click();
         }
     });
@@ -381,7 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error('Connection error:', error);
         }
     });
-
 
     spinButton.addEventListener('click', spinWheel);
     drawWheel();

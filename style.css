@@ -1,37 +1,57 @@
+* {
+    box-sizing: border-box;
+  }
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-color: #1a1a1a;
+    flex-direction: column;
+    min-height: 100vh;
+    background-image: url('https://img.goodfon.ru/original/2500x1409/d/ae/liga-chempionov-lch-stadion.jpg'); /* Замените path-to-your-image.jpg на путь к вашему изображению */
+    background-size: cover; /* Изображение растягивается, чтобы покрыть весь фон */
+    background-position: 47%; 
+    background-repeat: no-repeat; 
     color: #ffd700;
     text-align: center;
+    overflow: hidden; /* Убираем скролл */
+    place-items: center;
 }
 
+canvas {
+    width: 350px; /* Или другой фиксированный размер */
+    height: 350px;
+}
 .container {
     max-width: 600px;
     text-align: center;
+    width: 100%;
 }
 
 h1 {
-    font-size: 2.5rem;
-    margin-bottom: 40px;
+    position: relative;
+    top: 10%;
+    left: 0%;
+    font-size: 4vh; /* Увеличиваем размер шрифта */
+    margin-bottom: 10%; /* Поднимаем текст выше */
+    margin-top: 15%; /* Поднимаем текст выше */
+
 }
 
 .wheel-container {
-    position: relative;
-    width: 500px; /* Ширина контейнера равна колесу */
-    height: 500px; /* Высота контейнера равна колесу */
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
 }
 
 #wheel {
-    border: 10px solid #ffd700;
+    box-sizing: border-box; 
+    border: 5px solid #AD1519;
     border-radius: 50%;
+    box-shadow: 0 0 40px #AD1519; /* Добавляем сияние вокруг колеса */
+    background: radial-gradient(circle, #0a0905, #3615ad); /* Добавляем градиент фона */
 }
 
 .arrow {
@@ -41,16 +61,16 @@ h1 {
     border-right: 15px solid transparent;
     border-top: 30px solid white;
     position: absolute;
-    top: -15px;
+    top: -10px;
     left: 50%;
     transform: translateX(-50%);
+/* язычок */
 }
-
 button {
     margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
-    background: #ffd700;
+    padding: 8px 16px; /* Уменьшаем размеры кнопки на 20% */
+    font-size: 14px;
+    background: #FABD00;
     border: none;
     cursor: pointer;
     border-radius: 5px;
@@ -58,7 +78,7 @@ button {
 }
 
 button:hover {
-    background: #e6b800;
+    background: #FABD00;
 }
 
 button:disabled {
@@ -67,6 +87,7 @@ button:disabled {
 }
 
 .popup {
+    width: 100%;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -83,21 +104,15 @@ button:disabled {
     overflow-y: auto; /* Вертикальная прокрутка для длинного содержимого */
 }
 
-@media (max-width: 768px) {
-    .popup {
-        width: 70%; /* Ширина 95% экрана для мобильных */
-        max-height: 70%;
-    }
-}
 
 #rotating-text-container {
-    position: absolute;
-    top: 10%; /* Располагаем контейнер на 10% от верха экрана */
-    left: 50%; /* Центрируем контейнер по горизонтали */
-    transform: translateX(-50%); /* Центрируем текст относительно центра экрана */
-    width: 90%; /* Ограничиваем ширину до 90% экрана */
+    position: relative;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
     text-align: center;
-    font-size: 1.2rem; /* Размер текста для хорошей читаемости */
+    font-size: 2vw; /* Размер текста адаптируется к ширине экрана */
     overflow: hidden;
     height: 30px; /* Фиксируем высоту контейнера */
     white-space: nowrap; /* Убираем перенос строки */
@@ -138,7 +153,7 @@ input[type="file"] {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(187, 23, 23, 0.8);
     color: #fff;
     display: flex;
     justify-content: center;
@@ -149,34 +164,33 @@ input[type="file"] {
     pointer-events: none; /* Prevent interaction */
 }
 
-
-canvas {
-    display: block;
-    margin: 0 auto;
-}
 .spin-center-button {
     position: absolute;
-    top: 45%; /* Центрируем кнопку по вертикали */
-    left: 50%; /* Центрируем кнопку по горизонтали */
-    transform: translate(-50%, -50%); /* Корректируем смещение */
-    width: 80px; /* Устанавливаем ширину кнопки */
-    height: 80px; /* Высота равна ширине для круга */
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px; /* Уменьшаем ширину кнопки на 20% */
+    height: 64px; /* Высота равна ширине для круга */
     border-radius: 50%; /* Делаем кнопку круглой */
-    background: #ffd700; /* Цвет кнопки */
+    background: #FABD00; /* Цвет кнопки */
     color: #1a1a1a; /* Цвет текста */
     border: none; /* Убираем границу */
-    font-size: 16px; /* Размер текста */
+    font-size: 14px; /* Размер текста */
     font-weight: bold; /* Толстый текст */
     cursor: pointer; /* Указатель при наведении */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Тень для кнопки */
     transition: background 0.3s, transform 0.2s; /* Анимация при наведении */
+    display: flex;
+    justify-content: center; /* Центрируем текст по горизонтали */
+    align-items: center; /* Центрируем текст по вертикали */
+    text-align: center; /* Дополнительное выравнивание текста */
 }
 
 .spin-center-button:hover {
-    background: #e6b800; /* Цвет кнопки при наведении */
-    transform: translate(-50%, -50%) scale(1.1); /* Увеличение кнопки при наведении */
+    background: #e6b800;
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
 .spin-center-button:active {
-    transform: translate(-50%, -50%) scale(1); /* Убираем увеличение при нажатии */
+    transform: translate(-50%, -50%) scale(1);
 }
