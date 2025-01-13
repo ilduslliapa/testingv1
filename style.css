@@ -20,8 +20,9 @@ body {
 }
 
 canvas {
-    width: 350px; /* Или другой фиксированный размер */
-    height: 350px;
+    width: 100%; /* Занимает всю ширину родителя */
+    height: 100%; /* Занимает всю высоту родителя */
+    display: block; /* Убирает лишние отступы */
 }
 .container {
     max-width: 600px;
@@ -44,7 +45,11 @@ h1 {
     justify-content: center;
     align-items: center;
     position: relative;
+    margin: 0 auto;
+    width: 100%; /* Полная ширина контейнера */
+    max-width: 400px; /* Ограничение ширины */
 }
+
 
 #wheel {
     box-sizing: border-box; 
