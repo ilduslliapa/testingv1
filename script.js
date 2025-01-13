@@ -235,11 +235,11 @@ ctx.scale(scale, scale);
                         setTimeout(() => {
                             document.body.removeChild(queuePopup);
                             spinButton.disabled = false; // Enable the spin button
-                        }, 20);
+                        }, 2000);
                     }
-                }, 70);
+                }, 7000);
             }
-        }, 40);
+        }, 4000);
     }
 
 
