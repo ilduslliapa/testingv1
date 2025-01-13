@@ -28,11 +28,10 @@ body {
 
 @media (min-width: 769px) {
     canvas {
-        width: 600px;
-        height: 600px;
+        width: 400px;
+        height: 400px;
     }
 }
-
 .container {
     max-width: 600px;
     text-align: center;

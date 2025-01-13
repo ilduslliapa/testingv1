@@ -15,16 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById('submit-button');
     const serverUrl = "https://testingv1.onrender.com";
 
- // Установка размеров canvas
- const size = 350; // Стандартный размер для canvas
+    // Установка размеров canvas
 
     // Set up canvas scaling for high-resolution displays
     const scale = window.devicePixelRatio || 1;
-    canvas.style.width = `${size}px`;
-    canvas.style.height = `${size}px`;
-  canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
-canvas.height = size * scale;
-ctx.scale(scale, scale);
+    canvas.style.width = '400px';
+    canvas.style.height = '400px';
+    canvas.width = 400 * scale;
+    canvas.height = 400 * scale;
+    ctx.scale(scale, scale);
 
     let uploadStep = 0; // Tracks the current step in file upload
     const filesCache = []; // Temporarily stores uploaded files
