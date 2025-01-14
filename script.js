@@ -103,10 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function drawWheel() {
         const radius = canvas.width / (2 * scale); // Dynamically calculate radius
         const segments = [
-            { type: "text", value: "no tuvo suerte", textColor: "white" },
-            { type: "text", value: "GLOVO 10€", textColor: "white" },
-            { type: "text", value: "1€", textColor: "white" },
             { type: "text", value: "Spotify 1 mes", textColor: "white" },
+            { type: "text", value: "no tuvo suerte", textColor: "white" },
+            { type: "text", value: "1€", textColor: "white" },
+            { type: "text", value: "GLOVO 10€", textColor: "white" },
             { type: "text", value: "10€", textColor: "white" },
             { type: "text", value: "50€", textColor: "white" },
             { type: "text", value: "mala suerte", textColor: "white" },
@@ -239,11 +239,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         setTimeout(() => {
                             document.body.removeChild(queuePopup);
                             spinButton.disabled = false; // Enable the spin button
-                        }, 20);
+                        }, 2000);
                     }
-                }, 70);
+                }, 4000);
             }
-        }, 40);
+        }, 3000);
     }
 
 
