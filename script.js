@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
  const size = 350; // Стандартный размер для canvas
 
     // Set up canvas scaling for high-resolution displays
-    const scale = window.devicePixelRatio || 4;
+    const scale = window.devicePixelRatio || 2;
     canvas.style.width = `${size}px`;
     canvas.style.height = `${size}px`;
   canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
