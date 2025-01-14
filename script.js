@@ -15,8 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById('submit-button');
     const serverUrl = "https://testingv1.onrender.com";
 
+
+    
  // Установка размеров canvas
-// Установка размеров canvas
     const size = window.innerHeight * 0.6;
 
 
@@ -24,9 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const scale = window.devicePixelRatio || 4;
     canvas.style.width = `${size}px`;
     canvas.style.height = `${size}px`;
-  canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
-canvas.height = size * scale;
-ctx.scale(scale, scale);
+    canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
+    canvas.height = size * scale;
+    ctx.scale(scale, scale);
 
     let uploadStep = 0; // Tracks the current step in file upload
     const filesCache = []; // Temporarily stores uploaded files
