@@ -30,9 +30,9 @@ canvas {
     margin-bottom: 20%;
     top: 10%;
     max-width: 600px;
-    max-height: 400px;
+    max-height: 600px;
     text-align: center;
-    width: 100%;
+    width: 90%;
 }
 
 h1 {
