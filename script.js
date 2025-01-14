@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
  const size = 350; // Стандартный размер для canvas
 
     // Set up canvas scaling for high-resolution displays
-    const scale = window.devicePixelRatio || 2;
+    const scale = window.devicePixelRatio || 4;
     canvas.style.width = `${size}px`;
     canvas.style.height = `${size}px`;
   canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
@@ -111,7 +111,8 @@ ctx.scale(scale, scale);
         ];
         const colors = ["#1D304F", "#4F74B2", "#1D304F", "#4F74B2", "#1D304F", "#4F74B2", "#1D304F", "#B00000"];
         const segmentAngle = (2 * Math.PI) / segments.length;
-
+        const canvasHeight = canvas.height / scale; // Высота холста в логических единицах
+        const textSize = canvasHeight * 0.035; // Размер текста, зависящий от высоты экрана (2% от высоты)
         for (let i = 0; i < segments.length; i++) {
             ctx.beginPath();
             ctx.fillStyle = colors[i];
@@ -129,7 +130,7 @@ ctx.scale(scale, scale);
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = segments[i].textColor;
-            ctx.font = `bold ${7 * scale*1.3}px Helvetica`;
+            ctx.font = `bold ${textSize}px Helvetica`; // Используем textSize для размера шрифта;
             ctx.fillText(segments[i].value, radius / 1.5, 0);
             ctx.restore();
         }
