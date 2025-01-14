@@ -27,7 +27,7 @@ canvas {
 }
 .container {
     position: relative;
-    margin-bottom: 20%;
+    margin-bottom: 30%;
     top: 10%;
     max-width: 600px;
     max-height: 600px;
@@ -105,6 +105,7 @@ button:disabled {
     top: 50%;
     left: 50%;
     max-width: 80%; /* Увеличиваем ширину до 95% */
+    max-width: 400px;
     max-height: 80%; /* Увеличиваем высоту до 90% */
     transform: translate(-50%, -50%);
     background: #282c34;
