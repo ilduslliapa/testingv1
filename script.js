@@ -140,11 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function spinWheel() {
-        const totalDuration = 6000; // Total duration of spin in ms
+        const totalDuration = 8000; // Total duration of spin in ms
         const phase1 = 0.5; // Proportion of time for acceleration
         const phase2 = 0.5; // Proportion of time for deceleration
 
-        const totalRotation = 10 * Math.PI + Math.random() * Math.PI; // Randomized rotation amount
+        const totalRotation = 10.582 * Math.PI; // Randomized rotation amount
         const startAngle = lastStopAngle; // Begin from the last stopping point
         const startTime = performance.now();
 
