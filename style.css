@@ -21,10 +21,13 @@ body {
 
 canvas {
     width: 100%; /* Занимает всю ширину родителя */
-    height: 100%; /* Занимает всю высоту родителя */
+    max-width: 800px; /* Ограничение ширины */
+    height: 80%; /* Занимает всю высоту родителя */
     display: block; /* Убирает лишние отступы */
 }
 .container {
+    position: relative;
+    top: 10%;
     max-width: 600px;
     text-align: center;
     width: 100%;
@@ -35,23 +38,27 @@ h1 {
     top: 0%;
     left: 0%;
     font-size: 4vh; /* Увеличиваем размер шрифта */
-    margin-bottom: 50px; /* Поднимаем текст выше */
-    margin-top: 50px; /* Поднимаем текст выше */
+    margin-bottom: 10%; /* Поднимаем текст выше */
+    margin-top: 15%; /* Поднимаем текст выше */
 
 }
 
 .wheel-container {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
     margin: 0 auto;
     width: 100%; /* Полная ширина контейнера */
-    max-width: 400px; /* Ограничение ширины */
+    max-width: 800px; /* Ограничение ширины */
+    aspect-ratio: 1 / 1; /* Поддерживаем квадратную форму */
+    margin: 0 auto;
 }
 
 
 #wheel {
+    width: 100%; /* Занимает всю ширину родителя */
+    height: 100%; /* Занимает всю высоту родителя */
     box-sizing: border-box; 
     border: 5px solid #AD1519;
     border-radius: 50%;
@@ -171,16 +178,16 @@ input[type="file"] {
 
 .spin-center-button {
     position: absolute;
-    top: 45%;
+    top: 44%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 64px; /* Уменьшаем ширину кнопки на 20% */
-    height: 64px; /* Высота равна ширине для круга */
+    width: 10vh; /* Уменьшаем ширину кнопки на 20% */
+    height: 10vh; /* Высота равна ширине для круга */
     border-radius: 50%; /* Делаем кнопку круглой */
     background: #FABD00; /* Цвет кнопки */
     color: #1a1a1a; /* Цвет текста */
     border: none; /* Убираем границу */
-    font-size: 14px; /* Размер текста */
+    font-size: 2.1vh; /* Размер текста */
     font-weight: bold; /* Толстый текст */
     cursor: pointer; /* Указатель при наведении */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Тень для кнопки */
