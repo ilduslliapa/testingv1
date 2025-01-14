@@ -32,10 +32,10 @@ canvas {
 
 h1 {
     position: relative;
-    top: 10%;
+    top: 0%;
     left: 0%;
     font-size: 4vh; /* Увеличиваем размер шрифта */
-    margin-bottom: 10%; /* Поднимаем текст выше */
+    margin-bottom: 20%; /* Поднимаем текст выше */
     margin-top: 15%; /* Поднимаем текст выше */
 
 }
