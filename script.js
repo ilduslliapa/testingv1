@@ -129,7 +129,7 @@ ctx.scale(scale, scale);
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = segments[i].textColor;
-            ctx.font = `bold ${7 * scale*2}px Helvetica`;
+            ctx.font = `bold ${7 * scale*1.3}px Helvetica`;
             ctx.fillText(segments[i].value, radius / 1.5, 0);
             ctx.restore();
         }
