@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
  // Установка размеров canvas
 // Установка размеров canvas
-    const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+    const size = window.innerHeight * 0.6;
 
 
     // Set up canvas scaling for high-resolution displays
