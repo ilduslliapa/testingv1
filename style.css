@@ -27,10 +27,10 @@ canvas {
 }
 .container {
     position: relative;
-    margin-bottom: 10%;
+    margin-bottom: 20%;
     top: 10%;
     max-width: 600px;
-    max-height: 600px;
+    max-height: 400px;
     text-align: center;
     width: 100%;
 }
@@ -40,8 +40,8 @@ h1 {
     top: 0%;
     left: 0%;
     font-size: 4vh; /* Увеличиваем размер шрифта */
-    margin-bottom: 10%; /* Поднимаем текст выше */
-    margin-top: 15%; /* Поднимаем текст выше */
+    margin-bottom: 50px; /* Поднимаем текст выше */
+    margin-top: 50px; /* Поднимаем текст выше */
 
 }
 
