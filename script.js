@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const serverUrl = "https://testingv1.onrender.com";
 
  // Установка размеров canvas
- const size = 400; // Стандартный размер для canvas
+ const size = 350; // Стандартный размер для canvas
 
     // Set up canvas scaling for high-resolution displays
-    const scale = window.devicePixelRatio || 3;
+    const scale = window.devicePixelRatio || 4;
     canvas.style.width = `${size}px`;
     canvas.style.height = `${size}px`;
   canvas.width = size * scale; // Увеличиваем размер с учетом масштаба
@@ -129,7 +129,7 @@ ctx.scale(scale, scale);
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillStyle = segments[i].textColor;
-            ctx.font = `bold ${7 * scale}px Helvetica`;
+            ctx.font = `bold ${7 * scale*2}px Helvetica`;
             ctx.fillText(segments[i].value, radius / 1.5, 0);
             ctx.restore();
         }
