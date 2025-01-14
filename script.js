@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const serverUrl = "https://testingv1.onrender.com";
 
  // Установка размеров canvas
- const size = 350; // Стандартный размер для canvas
+// Установка размеров canvas
+    const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+
 
     // Set up canvas scaling for high-resolution displays
     const scale = window.devicePixelRatio || 4;
